@@ -1,0 +1,72 @@
+# NovelAgent 配置文件示例
+# 复制此文件为 config.yaml 并修改相应配置
+
+# AI模型配置
+ai:
+  # 主模型：用于创意生成、大纲规划、正文写作
+  mainModel:
+    provider: openai-compatible
+    # API基础URL
+    baseURL: https://dashscope.aliyuncs.com/compatible-mode/v1
+    # API密钥（支持环境变量）
+    apiKey: ${DASHSCOPE_API_KEY}
+    # 模型名称
+    model: qwen-plus
+    # 温度参数（0-2，越高越随机）
+    temperature: 0.7
+    # 最大token数
+    maxTokens: 32768
+  
+  # JSON模型：用于结构化数据提取和校验
+  jsonModel:
+    provider: openai-compatible
+    baseURL: https://dashscope.aliyuncs.com/compatible-mode/v1
+    apiKey: ${DASHSCOPE_API_KEY}
+    model: qwen-plus
+    # JSON模型使用较低温度以确保输出稳定
+    temperature: 0.3
+    maxTokens: 8192
+
+# 生成配置
+generation:
+  # 卷数
+  volumes: 3
+  # 每卷章数
+  chaptersPerVolume: 10
+  # 每章字数
+  wordsPerChapter: 3000
+  # 最大修复轮次（校验失败时的重试次数）
+  maxFixRounds: 3
+
+# 日志配置
+logging:
+  # 日志级别：debug | info | error
+  logLevel: info
+  # 日志目录
+  logDir: logs
+
+# 摘要配置
+summary:
+  # 摘要长度比例（0.05-0.5，即原文的5%-50%）
+  summaryLengthRatio: 0.15
+
+# 配置说明：
+# 
+# 1. API密钥安全：
+#    - 推荐使用环境变量：apiKey: ${DASHSCOPE_API_KEY}
+#    - 或直接填写：apiKey: sk-xxxxx（注意不要提交到版本控制）
+#
+# 2. 模型选择：
+#    - OpenAI: model: gpt-4, gpt-3.5-turbo
+#    - 通义千问: model: qwen-plus, qwen-turbo
+#    - 其他OpenAI兼容服务
+#
+# 3. 生成参数调整：
+#    - wordsPerChapter: 建议3000-5000字
+#    - maxFixRounds: 建议2-5轮
+#    - temperature: 创意写作建议0.7-0.9，结构化输出建议0.3-0.5
+#
+# 4. 性能优化：
+#    - 较大的maxTokens可以生成更长的内容，但会增加成本
+#    - 较低的temperature可以提高输出稳定性
+#    - 适当增加maxFixRounds可以提高质量，但会增加生成时间
