@@ -29,3 +29,17 @@ Thumbs.db
 # Temporary files
 *.tmp
 temp/
+
+# Project documentation (keep local, don't upload to GitHub)
+01-PRD-产品需求文档.md
+02-ARCHITECTURE-技术架构文档.md
+PROJECT-CHECKLIST.md
+RELEASE-CHECKLIST.md
+E2E-TEST-GUIDE.md
+CONTRIBUTING.md
+
+# Kiro specs (internal design documents)
+.kiro/specs/
+
+# Example config (keep the example, but ignore actual config)
+config.yaml
