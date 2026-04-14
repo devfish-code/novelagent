@@ -1,0 +1,38 @@
+# Dependencies
+node_modules
+web/node_modules
+
+# Build outputs
+dist
+web/dist
+coverage
+
+# Logs
+logs
+*.log
+
+# Environment files
+.env
+.env.local
+
+# IDE
+.vscode
+.idea
+
+# Git
+.git
+.gitignore
+
+# Test files
+**/*.test.ts
+**/*.spec.ts
+tests
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Project files (will be created at runtime)
+projects
+config.yaml

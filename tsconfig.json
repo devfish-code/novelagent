@@ -22,6 +22,6 @@
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/server/websocket/broadcaster.test.ts", "tests/server/websocket/server.test.ts", "tests/server/services/progressTracker.test.ts", "tests/server/services/taskManager.test.ts"],
   "exclude": ["node_modules", "dist", "tests"]
 }

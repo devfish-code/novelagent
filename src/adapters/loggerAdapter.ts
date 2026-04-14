@@ -1,12 +1,14 @@
 /**
  * Logger Adapter实现
  * 实现文件日志记录,支持日志级别过滤、敏感信息脱敏、结构化JSON格式
+ * 支持通过 WebSocket 实时推送日志事件
  */
 
 import * as fs from 'fs-extra';
 import * as path from 'node:path';
 import { LoggerPort, AIConversation } from '../core/ports.js';
 import { LoggingConfig } from '../core/models/config.js';
+import type { EventBroadcaster } from '../server/websocket/broadcaster.js';
 
 /**
  * 日志级别枚举
@@ -29,16 +31,25 @@ interface LogEntry {
 
 /**
  * 文件日志适配器
+ * 支持文件日志记录和可选的 WebSocket 实时推送
  */
 export class FileLoggerAdapter implements LoggerPort {
   private logLevel: LogLevel;
   private logDir: string;
   private logFilePath: string;
+  private wsBroadcaster?: EventBroadcaster;
+  private projectName?: string;
 
-  constructor(config: LoggingConfig) {
+  constructor(
+    config: LoggingConfig,
+    wsBroadcaster?: EventBroadcaster,
+    projectName?: string
+  ) {
     this.logLevel = this.parseLogLevel(config.logLevel);
     this.logDir = config.logDir;
     this.logFilePath = path.join(this.logDir, 'novel-generation.log');
+    this.wsBroadcaster = wsBroadcaster;
+    this.projectName = projectName;
     
     // 确保日志目录存在
     fs.ensureDirSync(this.logDir);
@@ -50,6 +61,7 @@ export class FileLoggerAdapter implements LoggerPort {
   info(message: string, context?: Record<string, unknown>): void {
     if (this.logLevel <= LogLevel.INFO) {
       this.writeLog('INFO', message, context);
+      this.broadcastLog('info', message, context);
     }
   }
 
@@ -59,6 +71,7 @@ export class FileLoggerAdapter implements LoggerPort {
   debug(message: string, context?: Record<string, unknown>): void {
     if (this.logLevel <= LogLevel.DEBUG) {
       this.writeLog('DEBUG', message, context);
+      this.broadcastLog('debug', message, context);
     }
   }
 
@@ -73,6 +86,7 @@ export class FileLoggerAdapter implements LoggerPort {
         errorStack: error.stack,
       } : undefined;
       this.writeLog('ERROR', message, context);
+      this.broadcastLog('error', message, context);
     }
   }
 
@@ -98,6 +112,37 @@ export class FileLoggerAdapter implements LoggerPort {
     } catch (error) {
       // 日志保存失败不应该影响主流程,只记录错误
       console.error(`Failed to save AI conversation: ${error}`);
+    }
+  }
+
+  /**
+   * 通过 WebSocket 广播日志事件
+   */
+  private broadcastLog(
+    level: 'info' | 'debug' | 'error',
+    message: string,
+    context?: Record<string, unknown>
+  ): void {
+    // 只有在同时提供了 wsBroadcaster 和 projectName 时才广播
+    if (!this.wsBroadcaster || !this.projectName) {
+      return;
+    }
+
+    try {
+      // 使用脱敏后的上下文
+      const sanitizedContext = context ? this.sanitizeContext(context) : undefined;
+
+      // 广播日志事件 (fire-and-forget, 不等待)
+      this.wsBroadcaster.broadcastLog(this.projectName, {
+        projectName: this.projectName,
+        timestamp: new Date().toISOString(),
+        level,
+        message,
+        context: sanitizedContext,
+      });
+    } catch (error) {
+      // WebSocket 广播失败不应该影响日志记录,只输出到控制台
+      console.error(`Failed to broadcast log via WebSocket: ${error}`);
     }
   }
 

@@ -1,0 +1,1 @@
+export { ChapterManager } from './ChapterManager';

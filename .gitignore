@@ -1,8 +1,10 @@
 # Dependencies
 node_modules/
+web/node_modules/
 
 # Build output
 dist/
+web/dist/
 
 # Test coverage
 coverage/
@@ -37,9 +39,27 @@ PROJECT-CHECKLIST.md
 RELEASE-CHECKLIST.md
 E2E-TEST-GUIDE.md
 CONTRIBUTING.md
+DEPLOYMENT.md
 
-# Kiro specs (internal design documents)
+# Kiro specs and steering (internal design documents)
 .kiro/specs/
+.kiro/steering/
+
+# Completion reports (internal)
+WEB-FRONTEND-COMPLETION-REPORT.md
+FINAL-COMPLETION-SUMMARY.md
+COMMIT_MESSAGE.txt
 
 # Example config (keep the example, but ignore actual config)
 config.yaml
+
+# PM2 logs
+.pm2/
+pm2-*.log
+
+# Docker volumes
+docker-volumes/
+
+# Projects directory (user-generated content)
+projects/
+
